@@ -1,0 +1,96 @@
+import { computeScore } from '../engine/gameEngine';
+
+const STARS = ['', '★', '★★', '★★★', '★★★★', '★★★★★'];
+
+export function DebriefScreen({ outcome, resources, choices, onRestart }) {
+  const score = computeScore(resources, outcome);
+  const livesPercent = outcome.maxLives > 0
+    ? Math.round((outcome.livesSaved / outcome.maxLives) * 100)
+    : 0;
+
+  return (
+    <div className="debrief-screen">
+      <div className="debrief-inner">
+        <header className="debrief-header">
+          <h1 className="debrief-title">{outcome.title}</h1>
+          <div className="debrief-stars" aria-label={`${score.stars} out of 5 stars`}>
+            {STARS[score.stars]}
+          </div>
+        </header>
+
+        <section className="debrief-narrative">
+          <p>{outcome.narrative}</p>
+        </section>
+
+        <section className="debrief-stats">
+          <h2>MISSION OUTCOME</h2>
+          <div className="debrief-stat-grid">
+            <div className="debrief-stat">
+              <div className="debrief-stat-value lives">{outcome.livesSaved.toLocaleString()}</div>
+              <div className="debrief-stat-label">Lives Saved</div>
+              <div className="debrief-stat-sub">out of {outcome.maxLives.toLocaleString()} ({livesPercent}%)</div>
+            </div>
+            <div className="debrief-stat">
+              <div className="debrief-stat-value cred">{Math.round(resources.credibility)}%</div>
+              <div className="debrief-stat-label">Credibility Remaining</div>
+            </div>
+            <div className="debrief-stat">
+              <div className="debrief-stat-value freedom">{Math.round(resources.freedom)}%</div>
+              <div className="debrief-stat-label">Freedom Status</div>
+            </div>
+            <div className="debrief-stat">
+              <div className="debrief-stat-value score">{score.total}</div>
+              <div className="debrief-stat-label">Total Score</div>
+            </div>
+          </div>
+        </section>
+
+        {outcome.achievements && outcome.achievements.length > 0 && (
+          <section className="debrief-achievements">
+            <h2>ACHIEVEMENTS UNLOCKED</h2>
+            <ul>
+              {outcome.achievements.map((a) => (
+                <li key={a.id} className="achievement">
+                  <span className="achievement-icon">🏆</span>
+                  <div>
+                    <strong>{a.label}</strong>
+                    <p>{a.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <section className="debrief-history">
+          <h2>WHAT ACTUALLY HAPPENED</h2>
+          <p>{outcome.historical}</p>
+        </section>
+
+        {outcome.epilogue && (
+          <section className="debrief-epilogue">
+            <h2>BUTTERFLY EFFECT</h2>
+            <p>{outcome.epilogue}</p>
+          </section>
+        )}
+
+        {choices.length > 0 && (
+          <section className="debrief-path">
+            <h2>YOUR PATH</h2>
+            <ol className="choice-log">
+              {choices.map((c, i) => (
+                <li key={i}>{c.label}</li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        <div className="debrief-actions">
+          <button className="btn-primary" onClick={onRestart}>
+            Play Again
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
