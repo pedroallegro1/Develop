@@ -4,9 +4,10 @@ import { GameScreen } from './components/GameScreen';
 import { DebriefScreen } from './components/DebriefScreen';
 import { initialGameState, GAME_PHASE } from './engine/gameEngine';
 import { septemberMorning } from './scenarios/septemberMorning';
+import { challengerFrozenORing } from './scenarios/challengerFrozenORing';
 import './App.css';
 
-const SCENARIOS = [septemberMorning];
+const SCENARIOS = [septemberMorning, challengerFrozenORing];
 
 export default function App() {
   const [screen, setScreen] = useState('start'); // 'start' | 'game' | 'debrief'
