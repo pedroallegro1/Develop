@@ -105,6 +105,60 @@ button {
   text-transform: uppercase;
 }
 
+.difficulty-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.difficulty-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.difficulty-options {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.difficulty-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.difficulty-btn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.difficulty-btn.selected {
+  background: var(--surface);
+  font-weight: 700;
+}
+
+.difficulty-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  min-height: 1.2em;
+}
+
 .scenario-title {
   font-size: 1.5rem;
   color: var(--text);

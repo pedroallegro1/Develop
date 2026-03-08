@@ -7,11 +7,38 @@ export const GAME_PHASE = {
   DEBRIEF: 'debrief',
 };
 
-export const initialGameState = (scenario) => ({
+export const DIFFICULTIES = ['Easy', 'Medium', 'Hard', 'Very Hard'];
+
+// Modifiers applied on top of scenario's startingResources
+const DIFFICULTY_MODIFIERS = {
+  Easy:      { time: +20, credibility: +25, freedom: +5 },
+  Medium:    { time:   0, credibility:   0, freedom:  0 },
+  Hard:      { time: -20, credibility: -15, freedom: -10 },
+  'Very Hard': { time: -40, credibility: -25, freedom: -20 },
+};
+
+export const DIFFICULTY_COLORS = {
+  Easy:        '#4ade80',
+  Medium:      '#facc15',
+  Hard:        '#fb923c',
+  'Very Hard': '#f87171',
+};
+
+export const applyDifficulty = (baseResources, difficulty) => {
+  const mod = DIFFICULTY_MODIFIERS[difficulty] ?? DIFFICULTY_MODIFIERS['Medium'];
+  return {
+    time:        Math.max(10, Math.min(100, baseResources.time        + mod.time)),
+    credibility: Math.max(5,  Math.min(100, baseResources.credibility + mod.credibility)),
+    freedom:     Math.max(10, Math.min(100, baseResources.freedom     + mod.freedom)),
+  };
+};
+
+export const initialGameState = (scenario, difficulty = 'Medium') => ({
   phase: GAME_PHASE.PLAYING,
   scenarioId: scenario.id,
+  difficulty,
   currentNodeId: scenario.startNodeId,
-  resources: { ...scenario.startingResources },
+  resources: applyDifficulty(scenario.startingResources, difficulty),
   knowledgeInventory: scenario.knowledgeInventory.map((k) => ({ ...k })),
   visitedNodes: [],
   choices: [], // { nodeId, optionId, label }

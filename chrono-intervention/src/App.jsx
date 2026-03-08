@@ -14,8 +14,8 @@ export default function App() {
   const [gameState, setGameState] = useState(null);
   const [debriefData, setDebriefData] = useState(null);
 
-  const handleStart = useCallback(() => {
-    setGameState(initialGameState(activeScenario));
+  const handleStart = useCallback((difficulty = 'Medium') => {
+    setGameState(initialGameState(activeScenario, difficulty));
     setScreen('game');
   }, [activeScenario]);
 
