@@ -97,6 +97,8 @@ const SCENARIO_META = {
   'september-morning':       { period: '2001', lives: '~2,977' },
   'challenger-frozen-oring': { period: '1986', lives: '7' },
   'chernobyl-night-shift':   { period: '1986', lives: '31 – 4,000+' },
+  'trojan-horse':            { period: '~1184 BCE', lives: '~35,000' },
+  'waterloo-hundred-days':   { period: '1815', lives: '~40,000' },
 };
 
 function ScenarioCard({ scenario, onSelect }) {
