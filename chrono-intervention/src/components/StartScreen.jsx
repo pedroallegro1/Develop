@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { DIFFICULTIES, DIFFICULTY_COLORS, applyDifficulty } from '../engine/gameEngine';
 
 // ── Main entry: two-phase flow ──────────────────────────────────────────────
-export function StartScreen({ scenarios, onStart, isBrutalUnlocked, unlockProgress, scenarioStats, scenarioRatings }) {
+export function StartScreen({ scenarios, onStart, isBrutalUnlocked, unlockProgress, scenarioStats, scenarioRatings, communityStats }) {
   const [selected, setSelected] = useState(null); // scenario object or null
 
   if (selected) {
@@ -12,6 +12,7 @@ export function StartScreen({ scenarios, onStart, isBrutalUnlocked, unlockProgre
         onStart={onStart}
         onBack={() => setSelected(null)}
         avgRating={scenarioRatings?.[selected.id]}
+        communityData={communityStats?.[selected.id]}
       />
     );
   }
@@ -24,12 +25,13 @@ export function StartScreen({ scenarios, onStart, isBrutalUnlocked, unlockProgre
       unlockProgress={unlockProgress}
       scenarioStats={scenarioStats}
       scenarioRatings={scenarioRatings}
+      communityStats={communityStats}
     />
   );
 }
 
 // ── Main Menu ───────────────────────────────────────────────────────────────
-function MainMenu({ scenarios, onSelect, isBrutalUnlocked, unlockProgress, scenarioStats, scenarioRatings }) {
+function MainMenu({ scenarios, onSelect, isBrutalUnlocked, unlockProgress, scenarioStats, scenarioRatings, communityStats }) {
   return (
     <div className="menu-screen">
       <div className="menu-inner">
@@ -93,6 +95,7 @@ function MainMenu({ scenarios, onSelect, isBrutalUnlocked, unlockProgress, scena
                 unlockProgress={unlockProgress}
                 stats={scenarioStats?.[s.id]}
                 avgRating={scenarioRatings?.[s.id]}
+                communityData={communityStats?.[s.id]}
               />
             ))}
           </div>
@@ -129,31 +132,48 @@ const COMPLEXITY_MAP = {
   'Very Hard': { label: 'Brutal',     color: '#f87171' },
 };
 
-function ScenarioStats({ stats, avgRating }) {
-  const hasStats = stats && stats.timesPlayed > 0;
-  const hasRating = avgRating != null;
-  if (!hasStats && !hasRating) return null;
+function ScenarioStats({ stats, avgRating, communityData }) {
+  const hasPersonal   = stats && stats.timesPlayed > 0;
+  const hasCommunity  = communityData && communityData.plays > 0;
+  if (!hasPersonal && !hasCommunity) return null;
 
-  const successRate = hasStats ? Math.round((stats.timesWon / stats.timesPlayed) * 100) : null;
+  const personalSuccessRate = hasPersonal ? Math.round((stats.timesWon / stats.timesPlayed) * 100) : null;
 
   return (
-    <div className="spc-stats">
-      {hasStats && (
-        <>
+    <div className="spc-stats-block">
+      {hasPersonal && (
+        <div className="spc-stats spc-stats--personal">
+          <span className="spc-stat-label">You</span>
           <span className="spc-stat">{stats.timesPlayed} played</span>
           <span className="spc-stat-sep">·</span>
-          <span className="spc-stat">{successRate}% success</span>
-        </>
+          <span className="spc-stat">{personalSuccessRate}% success</span>
+          {avgRating != null && (
+            <>
+              <span className="spc-stat-sep">·</span>
+              <span className="spc-stat">★ {avgRating.toFixed(1)}</span>
+            </>
+          )}
+        </div>
       )}
-      {hasStats && hasRating && <span className="spc-stat-sep">·</span>}
-      {hasRating && (
-        <span className="spc-stat">★ {avgRating.toFixed(1)}</span>
+      {hasCommunity && (
+        <div className="spc-stats spc-stats--community">
+          <span className="spc-stat-label">All players</span>
+          <span className="spc-stat">{communityData.plays.toLocaleString()} played</span>
+          <span className="spc-stat-sep">·</span>
+          <span className="spc-stat">{communityData.successRate}% success</span>
+          {communityData.avgRating != null && (
+            <>
+              <span className="spc-stat-sep">·</span>
+              <span className="spc-stat">★ {Number(communityData.avgRating).toFixed(1)}</span>
+            </>
+          )}
+        </div>
       )}
     </div>
   );
 }
 
-function ScenarioCard({ scenario, onSelect, isBrutalUnlocked, unlockProgress, stats, avgRating }) {
+function ScenarioCard({ scenario, onSelect, isBrutalUnlocked, unlockProgress, stats, avgRating, communityData }) {
   const meta       = SCENARIO_META[scenario.id] ?? {};
   const complexity = COMPLEXITY_MAP[scenario.difficulty] ?? COMPLEXITY_MAP['Medium'];
   const isBrutal   = scenario.difficulty === 'Very Hard';
@@ -184,7 +204,7 @@ function ScenarioCard({ scenario, onSelect, isBrutalUnlocked, unlockProgress, st
           <span className="spc-lives">{meta.lives} lives at stake</span>
         )}
       </div>
-      <ScenarioStats stats={stats} avgRating={avgRating} />
+      <ScenarioStats stats={stats} avgRating={avgRating} communityData={communityData} />
     </button>
   );
 }
@@ -241,7 +261,7 @@ function LockedBrutalCard({ scenario, meta, complexity, unlockProgress }) {
 }
 
 // ── Difficulty setup (after scenario is chosen) ─────────────────────────────
-function ScenarioSetup({ scenario, onStart, onBack, avgRating }) {
+function ScenarioSetup({ scenario, onStart, onBack, avgRating, communityData }) {
   const difficulties = DIFFICULTIES;
   const defaultIndex = difficulties.indexOf('Medium');
   const [selectedIndex, setSelectedIndex] = useState(defaultIndex);
@@ -267,8 +287,18 @@ function ScenarioSetup({ scenario, onStart, onBack, avgRating }) {
           <div className="scenario-card-header">
             <h2 className="scenario-title">{scenario.title}</h2>
             <p className="scenario-subtitle">{scenario.subtitle}</p>
-            {avgRating != null && (
-              <p className="scenario-avg-rating">★ {avgRating.toFixed(1)} / 5 avg rating</p>
+            {communityData && communityData.plays > 0 && (
+              <div className="scenario-community-stats">
+                <span>{communityData.plays.toLocaleString()} players worldwide</span>
+                <span className="spc-stat-sep">·</span>
+                <span>{communityData.successRate}% success rate</span>
+                {communityData.avgRating != null && (
+                  <>
+                    <span className="spc-stat-sep">·</span>
+                    <span>★ {Number(communityData.avgRating).toFixed(1)} avg</span>
+                  </>
+                )}
+              </div>
             )}
           </div>
 

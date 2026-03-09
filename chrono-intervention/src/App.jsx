@@ -9,6 +9,7 @@ import { DebriefScreen } from './components/DebriefScreen';
 import { AuthGate } from './components/AuthGate';
 import { initialGameState, GAME_PHASE, computeScore } from './engine/gameEngine';
 import { useProgress } from './hooks/useProgress';
+import { useAnalytics } from './hooks/useAnalytics';
 import { septemberMorning } from './scenarios/septemberMorning';
 import { challengerFrozenORing } from './scenarios/challengerFrozenORing';
 import { chernobylNightShift } from './scenarios/chernobylNightShift';
@@ -41,6 +42,7 @@ export default function App() {
   const [rewoundCount, setRewoundCount] = useState(0);
 
   const { recordCompletion, recordRating, isBrutalUnlocked, unlockProgress, scenarioStats, scenarioRatings } = useProgress(user?.id);
+  const { communityStats, trackPlay, trackRating } = useAnalytics();
 
   const handleStart = useCallback((scenario, difficulty = 'Medium') => {
     setActiveScenario(scenario);
@@ -62,9 +64,10 @@ export default function App() {
     const stars = computeScore(resources, outcome).stars;
     const won = (outcome?.livesSaved ?? 0) > 0;
     recordCompletion(scenarioId, difficulty, stars, won);
+    trackPlay(scenarioId, difficulty, won, stars);
     setDebriefData({ outcome, resources, choices, scenarioId });
     setScreen('debrief');
-  }, [recordCompletion]);
+  }, [recordCompletion, trackPlay]);
 
   // Rewind to state just before choice at historyIndex
   const handleRewind = useCallback((historyIndex) => {
@@ -110,6 +113,7 @@ export default function App() {
           unlockProgress={unlockProgress}
           scenarioStats={scenarioStats}
           scenarioRatings={scenarioRatings}
+          communityStats={communityStats}
         />
       )}
       {screen === 'game' && gameState && activeScenario && (
@@ -132,7 +136,10 @@ export default function App() {
           maxRewinds={MAX_REWINDS}
           onRewind={handleRewind}
           onRestart={handleRestart}
-          onRate={(star) => recordRating(debriefData.scenarioId, star)}
+          onRate={(star) => {
+            recordRating(debriefData.scenarioId, star);
+            trackRating(debriefData.scenarioId, star);
+          }}
         />
       )}
     </div>

@@ -1148,17 +1148,47 @@ button {
   text-align: right;
 }
 
+.spc-stats-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.6rem;
+}
+
 .spc-stats {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.5rem;
-  font-size: 0.7rem;
+  gap: 0.35rem;
+  font-size: 0.68rem;
   color: var(--text-dim);
 }
 
+.spc-stat-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  min-width: 5rem;
+}
+
+.spc-stats--community .spc-stat-label {
+  color: #60a5fa;
+  opacity: 0.75;
+}
+
 .spc-stat-sep {
-  opacity: 0.4;
+  opacity: 0.35;
+}
+
+.scenario-community-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: #60a5fa;
+  opacity: 0.85;
 }
 
 /* ── Locked Brutal card ──────────────────────────────────────────────────── */
