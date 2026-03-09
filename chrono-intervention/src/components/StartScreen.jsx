@@ -94,11 +94,14 @@ function MainMenu({ scenarios, onSelect }) {
 
 // ── Scenario card ───────────────────────────────────────────────────────────
 const SCENARIO_META = {
-  'september-morning':       { period: '2001', lives: '~2,977' },
-  'challenger-frozen-oring': { period: '1986', lives: '7' },
-  'chernobyl-night-shift':   { period: '1986', lives: '31 – 4,000+' },
+  'september-morning':       { period: '2001',      lives: '~2,977' },
+  'challenger-frozen-oring': { period: '1986',      lives: '7' },
+  'chernobyl-night-shift':   { period: '1986',      lives: '31 – 4,000+' },
   'trojan-horse':            { period: '~1184 BCE', lives: '~35,000' },
-  'waterloo-hundred-days':   { period: '1815', lives: '~40,000' },
+  'waterloo-hundred-days':   { period: '1815',      lives: '~40,000' },
+  'sarajevo-assassination':  { period: '1914',      lives: '~20,000,000' },
+  'constantinople-fall':     { period: '1453',      lives: '~4,000' },
+  'india-partition':         { period: '1947',      lives: '200,000 – 2,000,000' },
 };
 
 // Scenario complexity — how dense/demanding the scenario structure is, independent of starting conditions

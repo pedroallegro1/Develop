@@ -8,9 +8,21 @@ import { challengerFrozenORing } from './scenarios/challengerFrozenORing';
 import { chernobylNightShift } from './scenarios/chernobylNightShift';
 import { trojanHorse } from './scenarios/trojanHorse';
 import { waterlooHundredDays } from './scenarios/waterlooHundredDays';
+import { sarajevoAssassination } from './scenarios/sarajevoAssassination';
+import { constantinopleFall } from './scenarios/constantinopleFall';
+import { indiaPartition } from './scenarios/indiaPartition';
 import './App.css';
 
-const SCENARIOS = [septemberMorning, challengerFrozenORing, chernobylNightShift, trojanHorse, waterlooHundredDays];
+const SCENARIOS = [
+  septemberMorning,
+  challengerFrozenORing,
+  chernobylNightShift,
+  trojanHorse,
+  waterlooHundredDays,
+  sarajevoAssassination,
+  constantinopleFall,
+  indiaPartition,
+];
 const MAX_REWINDS = 2;
 
 export default function App() {
