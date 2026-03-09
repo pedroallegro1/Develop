@@ -5,20 +5,22 @@ import { DebriefScreen } from './components/DebriefScreen';
 import { initialGameState, GAME_PHASE } from './engine/gameEngine';
 import { septemberMorning } from './scenarios/septemberMorning';
 import { challengerFrozenORing } from './scenarios/challengerFrozenORing';
+import { chernobylNightShift } from './scenarios/chernobylNightShift';
 import './App.css';
 
-const SCENARIOS = [septemberMorning, challengerFrozenORing];
+const SCENARIOS = [septemberMorning, challengerFrozenORing, chernobylNightShift];
 
 export default function App() {
   const [screen, setScreen] = useState('start'); // 'start' | 'game' | 'debrief'
-  const [activeScenario] = useState(SCENARIOS[0]);
+  const [activeScenario, setActiveScenario] = useState(null);
   const [gameState, setGameState] = useState(null);
   const [debriefData, setDebriefData] = useState(null);
 
-  const handleStart = useCallback((difficulty = 'Medium') => {
-    setGameState(initialGameState(activeScenario, difficulty));
+  const handleStart = useCallback((scenario, difficulty = 'Medium') => {
+    setActiveScenario(scenario);
+    setGameState(initialGameState(scenario, difficulty));
     setScreen('game');
-  }, [activeScenario]);
+  }, []);
 
   const handleStateChange = useCallback((newState) => {
     setGameState(newState);
@@ -32,15 +34,16 @@ export default function App() {
   const handleRestart = useCallback(() => {
     setGameState(null);
     setDebriefData(null);
+    setActiveScenario(null);
     setScreen('start');
   }, []);
 
   return (
     <div className="app">
       {screen === 'start' && (
-        <StartScreen scenario={activeScenario} onStart={handleStart} />
+        <StartScreen scenarios={SCENARIOS} onStart={handleStart} />
       )}
-      {screen === 'game' && gameState && (
+      {screen === 'game' && gameState && activeScenario && (
         <GameScreen
           scenario={activeScenario}
           gameState={gameState}
