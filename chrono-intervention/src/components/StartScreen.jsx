@@ -101,9 +101,17 @@ const SCENARIO_META = {
   'waterloo-hundred-days':   { period: '1815', lives: '~40,000' },
 };
 
+// Scenario complexity — how dense/demanding the scenario structure is, independent of starting conditions
+const COMPLEXITY_MAP = {
+  Easy:        { label: 'Accessible', color: '#4ade80' },
+  Medium:      { label: 'Accessible', color: '#4ade80' },
+  Hard:        { label: 'Demanding',  color: '#fb923c' },
+  'Very Hard': { label: 'Brutal',     color: '#f87171' },
+};
+
 function ScenarioCard({ scenario, onSelect }) {
   const meta = SCENARIO_META[scenario.id] ?? {};
-  const diffColor = DIFFICULTY_COLORS[scenario.difficulty] ?? '#facc15';
+  const complexity = COMPLEXITY_MAP[scenario.difficulty] ?? COMPLEXITY_MAP['Medium'];
 
   return (
     <button className="scenario-pick-card" onClick={() => onSelect(scenario)}>
@@ -112,8 +120,8 @@ function ScenarioCard({ scenario, onSelect }) {
       <p className="spc-subtitle">{scenario.subtitle}</p>
       <p className="spc-tagline">{scenario.tagline}</p>
       <div className="spc-footer">
-        <span className="spc-difficulty" style={{ color: diffColor, borderColor: diffColor }}>
-          {scenario.difficulty}
+        <span className="spc-difficulty" style={{ color: complexity.color, borderColor: complexity.color }}>
+          {complexity.label}
         </span>
         {meta.lives && (
           <span className="spc-lives">{meta.lives} lives at stake</span>
@@ -155,7 +163,7 @@ function ScenarioSetup({ scenario, onStart, onBack }) {
           <p className="scenario-tagline">{scenario.tagline}</p>
 
           <div className="difficulty-selector">
-            <h3 className="difficulty-label">Difficulty</h3>
+            <h3 className="difficulty-label">Starting Conditions</h3>
             <div className="difficulty-options">
               {difficulties.map((d, i) => (
                 <button

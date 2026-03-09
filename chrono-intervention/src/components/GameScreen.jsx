@@ -6,17 +6,18 @@ import { SnapDecision } from './SnapDecision';
 import { NarrativeResult } from './NarrativeResult';
 import { processChoice, GAME_PHASE } from '../engine/gameEngine';
 
-export function GameScreen({ scenario, gameState, onStateChange, onDebrief }) {
+export function GameScreen({ scenario, gameState, onStateChange, onSnapshot, onDebrief, onExit }) {
   const [narrativeResult, setNarrativeResult] = useState(null);
+  const [confirmExit, setConfirmExit] = useState(false);
 
   const node = scenario.nodes[gameState.currentNodeId];
 
   const handleChoose = useCallback((optionId) => {
+    onSnapshot(gameState); // save state before processing this choice
     const newState = processChoice(gameState, scenario, optionId);
 
     if (newState.narrativeResult) {
       setNarrativeResult(newState.narrativeResult);
-      // Defer state change until narrative is dismissed
       setTimeout(() => {
         onStateChange(newState);
         if (newState.phase === GAME_PHASE.DEBRIEF) {
@@ -29,7 +30,7 @@ export function GameScreen({ scenario, gameState, onStateChange, onDebrief }) {
         onDebrief(newState.outcome, newState.resources, newState.choices);
       }
     }
-  }, [gameState, scenario, onStateChange, onDebrief]);
+  }, [gameState, scenario, onStateChange, onSnapshot, onDebrief]);
 
   const dismissNarrative = useCallback(() => setNarrativeResult(null), []);
 
@@ -38,6 +39,7 @@ export function GameScreen({ scenario, gameState, onStateChange, onDebrief }) {
       <div className="game-screen error-screen">
         <p>Story node not found: <code>{gameState.currentNodeId}</code></p>
         <p>This path hasn't been written yet — try a different route!</p>
+        <button className="btn-back" onClick={onExit}>← Back to menu</button>
       </div>
     );
   }
@@ -46,7 +48,7 @@ export function GameScreen({ scenario, gameState, onStateChange, onDebrief }) {
 
   return (
     <div className="game-screen">
-      <ResourceBars resources={gameState.resources} />
+      <ResourceBars resources={gameState.resources} onExitClick={() => setConfirmExit(true)} />
 
       <div className="game-main">
         <div className="scene-header">
@@ -89,6 +91,18 @@ export function GameScreen({ scenario, gameState, onStateChange, onDebrief }) {
 
       {narrativeResult && (
         <NarrativeResult text={narrativeResult} onDismiss={dismissNarrative} />
+      )}
+
+      {confirmExit && (
+        <div className="exit-overlay">
+          <div className="exit-dialog">
+            <p>Leave this scenario? Your progress will be lost.</p>
+            <div className="exit-dialog-actions">
+              <button className="btn-back" onClick={() => setConfirmExit(false)}>Stay</button>
+              <button className="btn-exit-confirm" onClick={onExit}>Leave</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

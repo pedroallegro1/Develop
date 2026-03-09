@@ -29,11 +29,15 @@ function formatTime(timePct) {
   return `${h}h ${m.toString().padStart(2, '0')}m remaining`;
 }
 
-export function ResourceBars({ resources }) {
+export function ResourceBars({ resources, onExitClick }) {
   const timeSubtitle = useMemo(() => formatTime(resources.time), [resources.time]);
 
   return (
     <div className="resource-bars">
+      <div className="resource-bars-header">
+        <span className="resource-bars-title">CHRONO INTERVENTION</span>
+        <button className="btn-exit-game" onClick={onExitClick}>← Menu</button>
+      </div>
       <ResourceBar
         icon="⏱"
         label="TIME"

@@ -251,13 +251,47 @@ button {
 .resource-bars {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 1rem 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.resource-bars-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.1rem;
+}
+
+.resource-bars-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.btn-exit-game {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  text-transform: uppercase;
+}
+
+.btn-exit-game:hover {
+  color: var(--text-muted);
+  background: var(--surface2);
 }
 
 .resource-bar-item { display: flex; flex-direction: column; gap: 0.2rem; }
@@ -701,7 +735,6 @@ button {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
   counter-reset: choice;
 }
 
@@ -712,7 +745,17 @@ button {
   position: relative;
 }
 
-.choice-log li::before {
+.choice-log li.choice-log-item {
+  padding-left: 0;
+}
+
+.choice-log-item .choice-log-label::before {
+  content: counter(choice) ". ";
+  counter-increment: choice;
+  color: var(--text-dim);
+}
+
+.choice-log li:not(.choice-log-item)::before {
   content: counter(choice) ".";
   counter-increment: choice;
   position: absolute;
@@ -721,6 +764,129 @@ button {
 }
 
 .debrief-actions { padding-top: 0.5rem; }
+
+/* ── DEBRIEF PATH / REWIND ───────────────────────────────────────────────────── */
+.debrief-path-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.debrief-path-header h2 { margin-bottom: 0; }
+
+.rewind-remaining {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.rewind-exhausted {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.rewind-hint {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-bottom: 0.6rem;
+  min-height: 1.2em;
+}
+
+.choice-log-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.choice-log-item:last-child { border-bottom: none; }
+
+.choice-log-label {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.btn-rewind {
+  background: none;
+  border: 1px solid var(--accent-dim);
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 0.2em 0.6em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-rewind:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+/* ── EXIT CONFIRMATION OVERLAY ───────────────────────────────────────────────── */
+.exit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1rem;
+}
+
+.exit-dialog {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 320px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.exit-dialog p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.exit-dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.btn-exit-confirm {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-exit-confirm:hover { background: #dc2626; }
 
 /* ── ERROR STATE ─────────────────────────────────────────────────────────────── */
 .error-screen {

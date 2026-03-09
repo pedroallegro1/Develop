@@ -2,11 +2,14 @@ import { computeScore } from '../engine/gameEngine';
 
 const STARS = ['', '★', '★★', '★★★', '★★★★', '★★★★★'];
 
-export function DebriefScreen({ outcome, resources, choices, onRestart }) {
+export function DebriefScreen({ outcome, resources, choices, history, rewoundCount, maxRewinds, onRewind, onRestart }) {
   const score = computeScore(resources, outcome);
   const livesPercent = outcome.maxLives > 0
     ? Math.round((outcome.livesSaved / outcome.maxLives) * 100)
     : 0;
+
+  const rewindsLeft = maxRewinds - rewoundCount;
+  const canRewind = rewindsLeft > 0 && history.length > 0;
 
   return (
     <div className="debrief-screen">
@@ -76,10 +79,36 @@ export function DebriefScreen({ outcome, resources, choices, onRestart }) {
 
         {choices.length > 0 && (
           <section className="debrief-path">
-            <h2>YOUR PATH</h2>
+            <div className="debrief-path-header">
+              <h2>YOUR PATH</h2>
+              {canRewind && (
+                <span className="rewind-remaining">
+                  ↩ {rewindsLeft} rewind{rewindsLeft !== 1 ? 's' : ''} remaining
+                </span>
+              )}
+              {!canRewind && rewoundCount > 0 && (
+                <span className="rewind-exhausted">No rewinds left</span>
+              )}
+            </div>
+            <p className="rewind-hint">
+              {canRewind
+                ? 'Click any decision to rewind and play from that point.'
+                : null}
+            </p>
             <ol className="choice-log">
               {choices.map((c, i) => (
-                <li key={i}>{c.label}</li>
+                <li key={i} className={`choice-log-item ${canRewind ? 'rewindable' : ''}`}>
+                  <span className="choice-log-label">{c.label}</span>
+                  {canRewind && (
+                    <button
+                      className="btn-rewind"
+                      onClick={() => onRewind(i)}
+                      title={`Rewind to before this decision`}
+                    >
+                      ↩ Rewind
+                    </button>
+                  )}
+                </li>
               ))}
             </ol>
           </section>
@@ -87,7 +116,7 @@ export function DebriefScreen({ outcome, resources, choices, onRestart }) {
 
         <div className="debrief-actions">
           <button className="btn-primary" onClick={onRestart}>
-            Play Again
+            New Scenario
           </button>
         </div>
       </div>
