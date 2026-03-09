@@ -19,9 +19,9 @@ function storageKey(userId) {
 function loadProgress(userId) {
   try {
     const raw = localStorage.getItem(storageKey(userId));
-    return raw ? JSON.parse(raw) : { completions: [] };
+    return raw ? JSON.parse(raw) : { completions: [], stats: {}, ratings: {} };
   } catch {
-    return { completions: [] };
+    return { completions: [], stats: {}, ratings: {} };
   }
 }
 
@@ -81,7 +81,7 @@ export function useProgress(userId) {
    * If the player has beaten the same scenario+difficulty before,
    * only the best star rating is kept.
    */
-  const recordCompletion = useCallback((scenarioId, difficulty, stars) => {
+  const recordCompletion = useCallback((scenarioId, difficulty, stars, won) => {
     setData(prev => {
       const idx = prev.completions.findIndex(
         c => c.scenarioId === scenarioId && c.difficulty === difficulty
@@ -99,19 +99,52 @@ export function useProgress(userId) {
             )
           : [...prev.completions, entry];
 
-      const next = { ...prev, completions };
+      const prevStats = prev.stats?.[scenarioId] ?? { timesPlayed: 0, timesWon: 0 };
+      const stats = {
+        ...prev.stats,
+        [scenarioId]: {
+          timesPlayed: prevStats.timesPlayed + 1,
+          timesWon:    prevStats.timesWon + (won ? 1 : 0),
+        },
+      };
+
+      const next = { ...prev, completions, stats };
       saveProgress(userId, next);
       return next;
     });
   }, []);
 
+  const recordRating = useCallback((scenarioId, star) => {
+    setData(prev => {
+      const prev_ = prev.ratings?.[scenarioId] ?? { total: 0, count: 0 };
+      const ratings = {
+        ...prev.ratings,
+        [scenarioId]: { total: prev_.total + star, count: prev_.count + 1 },
+      };
+      const next = { ...prev, ratings };
+      saveProgress(userId, next);
+      return next;
+    });
+  }, [userId]);
+
+  // Compute avg ratings: { [scenarioId]: number }
+  const scenarioRatings = {};
+  for (const [id, r] of Object.entries(data.ratings ?? {})) {
+    if (r.count > 0) scenarioRatings[id] = r.total / r.count;
+  }
+
   const { accessible, demanding, unlocked } = computeUnlock(data.completions);
 
   return {
     recordCompletion,
+    recordRating,
     /** True when Brutal scenarios are accessible. */
     isBrutalUnlocked: unlocked,
     /** Counts of distinct completed scenarios per tier — used for progress display. */
     unlockProgress: { accessible, demanding },
+    /** Per-scenario play/win stats: { [scenarioId]: { timesPlayed, timesWon } } */
+    scenarioStats: data.stats ?? {},
+    /** Per-scenario avg user rating: { [scenarioId]: number (1-5) } */
+    scenarioRatings,
   };
 }

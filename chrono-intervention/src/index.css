@@ -763,6 +763,55 @@ button {
   color: var(--text-dim);
 }
 
+.debrief-feedback {
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.debrief-feedback h2 {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+
+.feedback-stars {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.feedback-star {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--border);
+  padding: 0;
+  line-height: 1;
+  transition: color 0.1s, transform 0.1s;
+}
+
+.feedback-star.active,
+.feedback-star:hover {
+  color: #facc15;
+}
+
+.feedback-star:hover {
+  transform: scale(1.2);
+}
+
+.feedback-thanks {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.scenario-avg-rating {
+  font-size: 0.8rem;
+  color: #facc15;
+  margin-top: 0.25rem;
+}
+
 .debrief-actions { padding-top: 0.5rem; }
 
 /* ── DEBRIEF PATH / REWIND ───────────────────────────────────────────────────── */
@@ -1097,6 +1146,19 @@ button {
   font-size: 0.72rem;
   color: var(--text-dim);
   text-align: right;
+}
+
+.spc-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.spc-stat-sep {
+  opacity: 0.4;
 }
 
 /* ── Locked Brutal card ──────────────────────────────────────────────────── */

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { DIFFICULTIES, DIFFICULTY_COLORS, applyDifficulty } from '../engine/gameEngine';
 
 // ── Main entry: two-phase flow ──────────────────────────────────────────────
-export function StartScreen({ scenarios, onStart, isBrutalUnlocked, unlockProgress }) {
+export function StartScreen({ scenarios, onStart, isBrutalUnlocked, unlockProgress, scenarioStats, scenarioRatings }) {
   const [selected, setSelected] = useState(null); // scenario object or null
 
   if (selected) {
@@ -11,6 +11,7 @@ export function StartScreen({ scenarios, onStart, isBrutalUnlocked, unlockProgre
         scenario={selected}
         onStart={onStart}
         onBack={() => setSelected(null)}
+        avgRating={scenarioRatings?.[selected.id]}
       />
     );
   }
@@ -21,12 +22,14 @@ export function StartScreen({ scenarios, onStart, isBrutalUnlocked, unlockProgre
       onSelect={setSelected}
       isBrutalUnlocked={isBrutalUnlocked}
       unlockProgress={unlockProgress}
+      scenarioStats={scenarioStats}
+      scenarioRatings={scenarioRatings}
     />
   );
 }
 
 // ── Main Menu ───────────────────────────────────────────────────────────────
-function MainMenu({ scenarios, onSelect, isBrutalUnlocked, unlockProgress }) {
+function MainMenu({ scenarios, onSelect, isBrutalUnlocked, unlockProgress, scenarioStats, scenarioRatings }) {
   return (
     <div className="menu-screen">
       <div className="menu-inner">
@@ -88,6 +91,8 @@ function MainMenu({ scenarios, onSelect, isBrutalUnlocked, unlockProgress }) {
                 onSelect={onSelect}
                 isBrutalUnlocked={isBrutalUnlocked}
                 unlockProgress={unlockProgress}
+                stats={scenarioStats?.[s.id]}
+                avgRating={scenarioRatings?.[s.id]}
               />
             ))}
           </div>
@@ -124,7 +129,31 @@ const COMPLEXITY_MAP = {
   'Very Hard': { label: 'Brutal',     color: '#f87171' },
 };
 
-function ScenarioCard({ scenario, onSelect, isBrutalUnlocked, unlockProgress }) {
+function ScenarioStats({ stats, avgRating }) {
+  const hasStats = stats && stats.timesPlayed > 0;
+  const hasRating = avgRating != null;
+  if (!hasStats && !hasRating) return null;
+
+  const successRate = hasStats ? Math.round((stats.timesWon / stats.timesPlayed) * 100) : null;
+
+  return (
+    <div className="spc-stats">
+      {hasStats && (
+        <>
+          <span className="spc-stat">{stats.timesPlayed} played</span>
+          <span className="spc-stat-sep">·</span>
+          <span className="spc-stat">{successRate}% success</span>
+        </>
+      )}
+      {hasStats && hasRating && <span className="spc-stat-sep">·</span>}
+      {hasRating && (
+        <span className="spc-stat">★ {avgRating.toFixed(1)}</span>
+      )}
+    </div>
+  );
+}
+
+function ScenarioCard({ scenario, onSelect, isBrutalUnlocked, unlockProgress, stats, avgRating }) {
   const meta       = SCENARIO_META[scenario.id] ?? {};
   const complexity = COMPLEXITY_MAP[scenario.difficulty] ?? COMPLEXITY_MAP['Medium'];
   const isBrutal   = scenario.difficulty === 'Very Hard';
@@ -155,6 +184,7 @@ function ScenarioCard({ scenario, onSelect, isBrutalUnlocked, unlockProgress }) 
           <span className="spc-lives">{meta.lives} lives at stake</span>
         )}
       </div>
+      <ScenarioStats stats={stats} avgRating={avgRating} />
     </button>
   );
 }
@@ -211,7 +241,7 @@ function LockedBrutalCard({ scenario, meta, complexity, unlockProgress }) {
 }
 
 // ── Difficulty setup (after scenario is chosen) ─────────────────────────────
-function ScenarioSetup({ scenario, onStart, onBack }) {
+function ScenarioSetup({ scenario, onStart, onBack, avgRating }) {
   const difficulties = DIFFICULTIES;
   const defaultIndex = difficulties.indexOf('Medium');
   const [selectedIndex, setSelectedIndex] = useState(defaultIndex);
@@ -237,6 +267,9 @@ function ScenarioSetup({ scenario, onStart, onBack }) {
           <div className="scenario-card-header">
             <h2 className="scenario-title">{scenario.title}</h2>
             <p className="scenario-subtitle">{scenario.subtitle}</p>
+            {avgRating != null && (
+              <p className="scenario-avg-rating">★ {avgRating.toFixed(1)} / 5 avg rating</p>
+            )}
           </div>
 
           <p className="scenario-tagline">{scenario.tagline}</p>

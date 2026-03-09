@@ -1,8 +1,44 @@
+import { useState } from 'react';
 import { computeScore } from '../engine/gameEngine';
 
 const STARS = ['', '★', '★★', '★★★', '★★★★', '★★★★★'];
 
-export function DebriefScreen({ outcome, resources, choices, history, rewoundCount, maxRewinds, onRewind, onRestart }) {
+function FeedbackRating({ onRate }) {
+  const [hovered, setHovered] = useState(0);
+  const [submitted, setSubmitted] = useState(0);
+
+  const handleClick = (star) => {
+    if (submitted) return;
+    setSubmitted(star);
+    onRate(star);
+  };
+
+  return (
+    <section className="debrief-feedback">
+      <h2>RATE THIS SCENARIO</h2>
+      {submitted ? (
+        <p className="feedback-thanks">Thanks for the feedback! You rated it {submitted}/5.</p>
+      ) : (
+        <div className="feedback-stars">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              className={`feedback-star ${star <= (hovered || submitted) ? 'active' : ''}`}
+              onMouseEnter={() => setHovered(star)}
+              onMouseLeave={() => setHovered(0)}
+              onClick={() => handleClick(star)}
+              aria-label={`Rate ${star} out of 5`}
+            >
+              ★
+            </button>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+export function DebriefScreen({ outcome, resources, choices, history, rewoundCount, maxRewinds, onRewind, onRestart, onRate }) {
   const score = computeScore(resources, outcome);
   const livesPercent = outcome.maxLives > 0
     ? Math.round((outcome.livesSaved / outcome.maxLives) * 100)
@@ -113,6 +149,8 @@ export function DebriefScreen({ outcome, resources, choices, history, rewoundCou
             </ol>
           </section>
         )}
+
+        {onRate && <FeedbackRating onRate={onRate} />}
 
         <div className="debrief-actions">
           <button className="btn-primary" onClick={onRestart}>

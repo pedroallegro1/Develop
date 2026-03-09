@@ -1,5 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useUser, UserButton } from '@clerk/react';
+
+const KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ?? '';
+const AUTH_ENABLED = KEY.length > 20 && !KEY.includes('replace_me');
 import { StartScreen } from './components/StartScreen';
 import { GameScreen } from './components/GameScreen';
 import { DebriefScreen } from './components/DebriefScreen';
@@ -37,7 +40,7 @@ export default function App() {
   const [history, setHistory] = useState([]); // GameState snapshot before each choice
   const [rewoundCount, setRewoundCount] = useState(0);
 
-  const { recordCompletion, isBrutalUnlocked, unlockProgress } = useProgress(user?.id);
+  const { recordCompletion, recordRating, isBrutalUnlocked, unlockProgress, scenarioStats, scenarioRatings } = useProgress(user?.id);
 
   const handleStart = useCallback((scenario, difficulty = 'Medium') => {
     setActiveScenario(scenario);
@@ -57,8 +60,9 @@ export default function App() {
 
   const handleDebrief = useCallback((outcome, resources, choices, scenarioId, difficulty) => {
     const stars = computeScore(resources, outcome).stars;
-    recordCompletion(scenarioId, difficulty, stars);
-    setDebriefData({ outcome, resources, choices });
+    const won = (outcome?.livesSaved ?? 0) > 0;
+    recordCompletion(scenarioId, difficulty, stars, won);
+    setDebriefData({ outcome, resources, choices, scenarioId });
     setScreen('debrief');
   }, [recordCompletion]);
 
@@ -93,15 +97,19 @@ export default function App() {
   return (
     <AuthGate>
     <div className="app">
-      <div className="user-button-corner">
-        <UserButton />
-      </div>
+      {AUTH_ENABLED && (
+        <div className="user-button-corner">
+          <UserButton />
+        </div>
+      )}
       {screen === 'start' && (
         <StartScreen
           scenarios={SCENARIOS}
           onStart={handleStart}
           isBrutalUnlocked={isBrutalUnlocked}
           unlockProgress={unlockProgress}
+          scenarioStats={scenarioStats}
+          scenarioRatings={scenarioRatings}
         />
       )}
       {screen === 'game' && gameState && activeScenario && (
@@ -124,6 +132,7 @@ export default function App() {
           maxRewinds={MAX_REWINDS}
           onRewind={handleRewind}
           onRestart={handleRestart}
+          onRate={(star) => recordRating(debriefData.scenarioId, star)}
         />
       )}
     </div>
