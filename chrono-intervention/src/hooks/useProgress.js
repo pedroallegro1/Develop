@@ -10,22 +10,24 @@
 
 import { useState, useCallback } from 'react';
 
-const STORAGE_KEY = 'chrono-progress-v1';
-
 // ── Storage primitives ───────────────────────────────────────────────────────
 
-function loadProgress() {
+function storageKey(userId) {
+  return userId ? `chrono-progress-v1-${userId}` : 'chrono-progress-v1';
+}
+
+function loadProgress(userId) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey(userId));
     return raw ? JSON.parse(raw) : { completions: [] };
   } catch {
     return { completions: [] };
   }
 }
 
-function saveProgress(data) {
+function saveProgress(userId, data) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(storageKey(userId), JSON.stringify(data));
   } catch {
     // Storage unavailable (private browsing quota, etc.) — silently ignore
   }
@@ -71,8 +73,8 @@ function computeUnlock(completions) {
 
 // ── Hook ─────────────────────────────────────────────────────────────────────
 
-export function useProgress() {
-  const [data, setData] = useState(loadProgress);
+export function useProgress(userId) {
+  const [data, setData] = useState(() => loadProgress(userId));
 
   /**
    * Record a scenario completion.
@@ -98,7 +100,7 @@ export function useProgress() {
           : [...prev.completions, entry];
 
       const next = { ...prev, completions };
-      saveProgress(next);
+      saveProgress(userId, next);
       return next;
     });
   }, []);

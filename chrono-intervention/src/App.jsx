@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react';
+import { useUser, UserButton } from '@clerk/react';
 import { StartScreen } from './components/StartScreen';
 import { GameScreen } from './components/GameScreen';
 import { DebriefScreen } from './components/DebriefScreen';
+import { AuthGate } from './components/AuthGate';
 import { initialGameState, GAME_PHASE, computeScore } from './engine/gameEngine';
 import { useProgress } from './hooks/useProgress';
 import { septemberMorning } from './scenarios/septemberMorning';
@@ -27,6 +29,7 @@ const SCENARIOS = [
 const MAX_REWINDS = 2;
 
 export default function App() {
+  const { user } = useUser();
   const [screen, setScreen] = useState('start'); // 'start' | 'game' | 'debrief'
   const [activeScenario, setActiveScenario] = useState(null);
   const [gameState, setGameState] = useState(null);
@@ -34,7 +37,7 @@ export default function App() {
   const [history, setHistory] = useState([]); // GameState snapshot before each choice
   const [rewoundCount, setRewoundCount] = useState(0);
 
-  const { recordCompletion, isBrutalUnlocked, unlockProgress } = useProgress();
+  const { recordCompletion, isBrutalUnlocked, unlockProgress } = useProgress(user?.id);
 
   const handleStart = useCallback((scenario, difficulty = 'Medium') => {
     setActiveScenario(scenario);
@@ -88,7 +91,11 @@ export default function App() {
   }, []);
 
   return (
+    <AuthGate>
     <div className="app">
+      <div className="user-button-corner">
+        <UserButton />
+      </div>
       {screen === 'start' && (
         <StartScreen
           scenarios={SCENARIOS}
@@ -120,5 +127,6 @@ export default function App() {
         />
       )}
     </div>
+    </AuthGate>
   );
 }

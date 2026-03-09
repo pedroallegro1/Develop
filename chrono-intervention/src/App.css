@@ -3,3 +3,48 @@
   display: flex;
   flex-direction: column;
 }
+
+/* ── Auth ─────────────────────────────────────────────────────────────────── */
+
+.auth-loading {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+.auth-screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.auth-header {
+  text-align: center;
+}
+
+.auth-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.auth-header p {
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* ── User button (top-right overlay) ─────────────────────────────────────── */
+
+.user-button-corner {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+}
