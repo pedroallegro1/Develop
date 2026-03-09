@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { DIFFICULTIES, DIFFICULTY_COLORS, applyDifficulty } from '../engine/gameEngine';
 
 // ── Main entry: two-phase flow ──────────────────────────────────────────────
-export function StartScreen({ scenarios, onStart }) {
+export function StartScreen({ scenarios, onStart, isBrutalUnlocked, unlockProgress }) {
   const [selected, setSelected] = useState(null); // scenario object or null
 
   if (selected) {
@@ -15,11 +15,18 @@ export function StartScreen({ scenarios, onStart }) {
     );
   }
 
-  return <MainMenu scenarios={scenarios} onSelect={setSelected} />;
+  return (
+    <MainMenu
+      scenarios={scenarios}
+      onSelect={setSelected}
+      isBrutalUnlocked={isBrutalUnlocked}
+      unlockProgress={unlockProgress}
+    />
+  );
 }
 
 // ── Main Menu ───────────────────────────────────────────────────────────────
-function MainMenu({ scenarios, onSelect }) {
+function MainMenu({ scenarios, onSelect, isBrutalUnlocked, unlockProgress }) {
   return (
     <div className="menu-screen">
       <div className="menu-inner">
@@ -75,7 +82,13 @@ function MainMenu({ scenarios, onSelect }) {
           <h2 className="menu-section-label">Choose Your Intervention</h2>
           <div className="scenario-grid">
             {scenarios.map((s) => (
-              <ScenarioCard key={s.id} scenario={s} onSelect={onSelect} />
+              <ScenarioCard
+                key={s.id}
+                scenario={s}
+                onSelect={onSelect}
+                isBrutalUnlocked={isBrutalUnlocked}
+                unlockProgress={unlockProgress}
+              />
             ))}
           </div>
         </section>
@@ -104,7 +117,6 @@ const SCENARIO_META = {
   'india-partition':         { period: '1947',      lives: '200,000 – 2,000,000' },
 };
 
-// Scenario complexity — how dense/demanding the scenario structure is, independent of starting conditions
 const COMPLEXITY_MAP = {
   Easy:        { label: 'Accessible', color: '#4ade80' },
   Medium:      { label: 'Accessible', color: '#4ade80' },
@@ -112,9 +124,22 @@ const COMPLEXITY_MAP = {
   'Very Hard': { label: 'Brutal',     color: '#f87171' },
 };
 
-function ScenarioCard({ scenario, onSelect }) {
-  const meta = SCENARIO_META[scenario.id] ?? {};
+function ScenarioCard({ scenario, onSelect, isBrutalUnlocked, unlockProgress }) {
+  const meta       = SCENARIO_META[scenario.id] ?? {};
   const complexity = COMPLEXITY_MAP[scenario.difficulty] ?? COMPLEXITY_MAP['Medium'];
+  const isBrutal   = scenario.difficulty === 'Very Hard';
+  const locked     = isBrutal && !isBrutalUnlocked;
+
+  if (locked) {
+    return (
+      <LockedBrutalCard
+        scenario={scenario}
+        meta={meta}
+        complexity={complexity}
+        unlockProgress={unlockProgress}
+      />
+    );
+  }
 
   return (
     <button className="scenario-pick-card" onClick={() => onSelect(scenario)}>
@@ -131,6 +156,57 @@ function ScenarioCard({ scenario, onSelect }) {
         )}
       </div>
     </button>
+  );
+}
+
+function LockedBrutalCard({ scenario, meta, complexity, unlockProgress }) {
+  const { accessible, demanding } = unlockProgress;
+  // Which path is closer to unlocking?
+  const accessibleNeeded = Math.max(0, 2 - accessible);
+  const demandingNeeded  = Math.max(0, 1 - demanding);
+
+  let hint;
+  if (accessible === 1 && demanding === 0) {
+    hint = '1 more Accessible scenario, or 1 Demanding scenario';
+  } else if (accessible === 0 && demanding === 0) {
+    hint = '2 Accessible scenarios, or 1 Demanding scenario';
+  } else if (accessibleNeeded > 0 && demandingNeeded === 0) {
+    // shouldn't happen (would be unlocked) but just in case
+    hint = 'Complete 1 Demanding scenario';
+  } else {
+    hint = `${accessibleNeeded} more Accessible, or ${demandingNeeded} Demanding`;
+  }
+
+  return (
+    <div
+      className="scenario-pick-card scenario-pick-card--locked"
+      role="img"
+      aria-label={`${scenario.title} — locked`}
+    >
+      <div className="spc-year">{meta.period}</div>
+      <h3 className="spc-title">{scenario.title}</h3>
+      <p className="spc-subtitle">{scenario.subtitle}</p>
+      <p className="spc-tagline spc-tagline--locked">{scenario.tagline}</p>
+
+      <div className="spc-lock-banner">
+        <div className="spc-lock-top">
+          <svg className="spc-lock-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor" opacity="0.9"/>
+            <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          <span className="spc-lock-label">Brutal — Locked</span>
+        </div>
+        <p className="spc-lock-req">Complete {hint} to unlock</p>
+        <div className="spc-lock-progress">
+          <span className={accessible >= 1 ? 'spc-pip spc-pip--done' : 'spc-pip'} />
+          <span className={accessible >= 2 ? 'spc-pip spc-pip--done' : 'spc-pip'} />
+          <span className="spc-pip-sep">Accessible</span>
+          <span className="spc-pip-or">or</span>
+          <span className={demanding >= 1 ? 'spc-pip spc-pip--done' : 'spc-pip'} />
+          <span className="spc-pip-sep">Demanding</span>
+        </div>
+      </div>
+    </div>
   );
 }
 

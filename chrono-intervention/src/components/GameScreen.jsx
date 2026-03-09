@@ -21,13 +21,13 @@ export function GameScreen({ scenario, gameState, onStateChange, onSnapshot, onD
       setTimeout(() => {
         onStateChange(newState);
         if (newState.phase === GAME_PHASE.DEBRIEF) {
-          onDebrief(newState.outcome, newState.resources, newState.choices);
+          onDebrief(newState.outcome, newState.resources, newState.choices, scenario.id, newState.difficulty);
         }
       }, 3200);
     } else {
       onStateChange(newState);
       if (newState.phase === GAME_PHASE.DEBRIEF) {
-        onDebrief(newState.outcome, newState.resources, newState.choices);
+        onDebrief(newState.outcome, newState.resources, newState.choices, scenario.id, newState.difficulty);
       }
     }
   }, [gameState, scenario, onStateChange, onSnapshot, onDebrief]);

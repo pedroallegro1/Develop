@@ -1099,6 +1099,93 @@ button {
   text-align: right;
 }
 
+/* ── Locked Brutal card ──────────────────────────────────────────────────── */
+
+.scenario-pick-card--locked {
+  cursor: default;
+  opacity: 0.72;
+  filter: grayscale(0.25);
+  border-style: dashed;
+}
+
+.spc-tagline--locked {
+  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+}
+
+.spc-lock-banner {
+  margin-top: auto;
+  padding: 0.65rem 0.75rem 0.6rem;
+  background: rgba(248, 113, 113, 0.07);
+  border-top: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: 0 0 7px 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.spc-lock-top {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.spc-lock-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  color: #f87171;
+}
+
+.spc-lock-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #f87171;
+}
+
+.spc-lock-req {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.spc-lock-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.spc-pip {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid #4b5563;
+  background: transparent;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.spc-pip--done {
+  border-color: #4ade80;
+  background: #4ade80;
+}
+
+.spc-pip-sep {
+  font-size: 0.65rem;
+  color: #6b7280;
+  letter-spacing: 0.04em;
+}
+
+.spc-pip-or {
+  font-size: 0.65rem;
+  color: #4b5563;
+  margin: 0 0.15rem;
+}
+
 /* Menu footer */
 .menu-footer {
   text-align: center;

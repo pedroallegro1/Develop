@@ -2,7 +2,8 @@ import { useState, useCallback } from 'react';
 import { StartScreen } from './components/StartScreen';
 import { GameScreen } from './components/GameScreen';
 import { DebriefScreen } from './components/DebriefScreen';
-import { initialGameState, GAME_PHASE } from './engine/gameEngine';
+import { initialGameState, GAME_PHASE, computeScore } from './engine/gameEngine';
+import { useProgress } from './hooks/useProgress';
 import { septemberMorning } from './scenarios/septemberMorning';
 import { challengerFrozenORing } from './scenarios/challengerFrozenORing';
 import { chernobylNightShift } from './scenarios/chernobylNightShift';
@@ -33,6 +34,8 @@ export default function App() {
   const [history, setHistory] = useState([]); // GameState snapshot before each choice
   const [rewoundCount, setRewoundCount] = useState(0);
 
+  const { recordCompletion, isBrutalUnlocked, unlockProgress } = useProgress();
+
   const handleStart = useCallback((scenario, difficulty = 'Medium') => {
     setActiveScenario(scenario);
     setGameState(initialGameState(scenario, difficulty));
@@ -49,10 +52,12 @@ export default function App() {
     setGameState(newState);
   }, []);
 
-  const handleDebrief = useCallback((outcome, resources, choices) => {
+  const handleDebrief = useCallback((outcome, resources, choices, scenarioId, difficulty) => {
+    const stars = computeScore(resources, outcome).stars;
+    recordCompletion(scenarioId, difficulty, stars);
     setDebriefData({ outcome, resources, choices });
     setScreen('debrief');
-  }, []);
+  }, [recordCompletion]);
 
   // Rewind to state just before choice at historyIndex
   const handleRewind = useCallback((historyIndex) => {
@@ -85,7 +90,12 @@ export default function App() {
   return (
     <div className="app">
       {screen === 'start' && (
-        <StartScreen scenarios={SCENARIOS} onStart={handleStart} />
+        <StartScreen
+          scenarios={SCENARIOS}
+          onStart={handleStart}
+          isBrutalUnlocked={isBrutalUnlocked}
+          unlockProgress={unlockProgress}
+        />
       )}
       {screen === 'game' && gameState && activeScenario && (
         <GameScreen
