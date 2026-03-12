@@ -115,14 +115,14 @@ function MainMenu({ scenarios, onSelect, isBrutalUnlocked, unlockProgress, scena
 
 // ── Scenario card ───────────────────────────────────────────────────────────
 const SCENARIO_META = {
-  'september-morning':       { period: '2001',      lives: '~2,977' },
-  'challenger-frozen-oring': { period: '1986',      lives: '7' },
-  'chernobyl-night-shift':   { period: '1986',      lives: '31 – 4,000+' },
-  'trojan-horse':            { period: '~1184 BCE', lives: '~35,000' },
-  'waterloo-hundred-days':   { period: '1815',      lives: '~40,000' },
-  'sarajevo-assassination':  { period: '1914',      lives: '~20,000,000' },
-  'constantinople-fall':     { period: '1453',      lives: '~4,000' },
-  'india-partition':         { period: '1947',      lives: '200,000 – 2,000,000' },
+  'september-morning':       { period: '2001',      lives: '~2,977',              coverImage: '/images/scenarios/september-morning.jpg' },
+  'challenger-frozen-oring': { period: '1986',      lives: '7',                   coverImage: '/images/scenarios/challenger-frozen-oring.jpg' },
+  'chernobyl-night-shift':   { period: '1986',      lives: '31 – 4,000+',         coverImage: '/images/scenarios/chernobyl-night-shift.jpg' },
+  'trojan-horse':            { period: '~1184 BCE', lives: '~35,000',             coverImage: '/images/scenarios/trojan-horse.jpg' },
+  'waterloo-hundred-days':   { period: '1815',      lives: '~40,000',             coverImage: '/images/scenarios/waterloo-hundred-days.jpg' },
+  'sarajevo-assassination':  { period: '1914',      lives: '~20,000,000',         coverImage: '/images/scenarios/sarajevo-assassination.jpg' },
+  'constantinople-fall':     { period: '1453',      lives: '~4,000',              coverImage: '/images/scenarios/constantinople-fall.jpg' },
+  'india-partition':         { period: '1947',      lives: '200,000 – 2,000,000', coverImage: '/images/scenarios/india-partition.jpg' },
 };
 
 const COMPLEXITY_MAP = {
@@ -192,6 +192,11 @@ function ScenarioCard({ scenario, onSelect, isBrutalUnlocked, unlockProgress, st
 
   return (
     <button className="scenario-pick-card" onClick={() => onSelect(scenario)}>
+      {meta.coverImage && (
+        <div className="spc-cover-wrap">
+          <img className="spc-cover-img" src={meta.coverImage} alt="" aria-hidden="true" />
+        </div>
+      )}
       <div className="spc-year">{meta.period}</div>
       <h3 className="spc-title">{scenario.title}</h3>
       <p className="spc-subtitle">{scenario.subtitle}</p>
@@ -233,6 +238,11 @@ function LockedBrutalCard({ scenario, meta, complexity, unlockProgress }) {
       role="img"
       aria-label={`${scenario.title} — locked`}
     >
+      {meta.coverImage && (
+        <div className="spc-cover-wrap">
+          <img className="spc-cover-img" src={meta.coverImage} alt="" aria-hidden="true" />
+        </div>
+      )}
       <div className="spc-year">{meta.period}</div>
       <h3 className="spc-title">{scenario.title}</h3>
       <p className="spc-subtitle">{scenario.subtitle}</p>
@@ -284,6 +294,11 @@ function ScenarioSetup({ scenario, onStart, onBack, avgRating, communityData }) 
         </div>
 
         <div className="scenario-card">
+          {SCENARIO_META[scenario.id]?.coverImage && (
+            <div className="scenario-cover-wrap">
+              <img className="scenario-cover-img" src={SCENARIO_META[scenario.id].coverImage} alt="" aria-hidden="true" />
+            </div>
+          )}
           <div className="scenario-card-header">
             <h2 className="scenario-title">{scenario.title}</h2>
             <p className="scenario-subtitle">{scenario.subtitle}</p>
